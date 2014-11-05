@@ -1,0 +1,55 @@
+@CHARSET "UTF-8";
+
+body{
+	font-size:12px;
+	font-family: sans-serif;
+	padding: 0;
+	margin:0;
+}
+
+.highlight_table{background:orange}
+
+#map{
+	width:100%;
+	height:100%;
+}
+
+.capacite{font-size:10pt;float:right}
+
+.parking_icon{height:18pt}
+
+#leftPanel{
+	position:absolute;
+	left:10px;
+	top :10px;
+	overflow:auto;
+	width:200pt;
+	z-index:99;
+}
+
+#aboutButton{
+	position:absolute;
+	right:70px;
+	top :10px;
+	z-index:99;
+}
+
+.ui-dialog{
+	z-index:1001 !important;
+}
+
+h1{font-size:120%}
+
+/* Leaflet Daw control helpers must be hidden while drawing */
+.leaflet-draw-toolbar {display:none}
+.leaflet-draw-section {display:none}
+.leaflet-draw-actions{display:none}
+.ui-accordion-content{padding:4px !important;max-height:600px}
+
+
+@media screen and (max-width: 640px) {
+  #leftPanel{left:0px;top :0px}
+  .leaflet-control-scale-line{display:none}
+  .leaflet-control-attribution{display:none}
+  #aboutButton{right:0px;bottom:0px;top:auto}
+}

@@ -1,0 +1,11 @@
+/*
+	Mobile-specific instructions
+	
+	The zone analysis is disabled, as leaftlet.draw does not work properly with touch controls
+*/
+#zone_analysis{display:none}
+/* Quick and dirty hack to make dialog "work" on a smartphone */
+@media screen and (max-width: 640px) {
+.ui-dialog{height:95% !important;width:90%!important}
+.ui-dialog-content{height:90% !important}
+}
