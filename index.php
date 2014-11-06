@@ -59,6 +59,7 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 			<input type="button" id="eraseZone" value="Effacer"></P>
 		</div>
 	</div>
+	<?php if(MODE_ZONE_FILTER){?>
 	<h3>Communes</h3>
 	<div>
 		<input type="button" id="zonesAll" value="Tout" />
@@ -66,6 +67,7 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 		<input type="button" id="zonesApply" value="Appliquer" />
 		<div id="zoneList"></div>
 	</div>
+	<?php }?>
 	<h3>Légende / aide</h3>
 	<div id="help">
 	<?php include("locale/fr-fr/help.html"); ?>

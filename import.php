@@ -1,5 +1,11 @@
 <?php
 require 'conf.php';
+/**
+	PARKINGS IMPORT BATCH
+	
+	 * Import bicycle parking within an area 
+	 * Calculate pseudo-isochrones
+*/
 
 try {
 	$PDO = new PDO( 'pgsql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD );
@@ -7,7 +13,7 @@ try {
 	die("Unable to connect database");
 }
 
-// The following Overpass API query gets all nodes and ways within a zone, with tag "amenity=bicycle_parking"
+// The following Overpass API query gets all nodes and ways within an area, with tag "amenity=bicycle_parking"
 $postdata = http_build_query(array('data' => '<osm-script >
   <union>
 	<query type="node">
@@ -41,13 +47,15 @@ $result = file_get_contents("http://overpass.osm.rambler.ru/cgi/interpreter", fa
 if($result)
 	{
 
-	//Database::getConn()->Execute("TRUNCATE TABLE pv_parkings");	
+	/**
+		STEP 1 : IMPORT PARKINS FROM OVERPASS API
+	*/
 	$PDO->exec("TRUNCATE TABLE pv_parkings");	
 
 	$dom = new DomDocument();
 	$dom->loadXML($result);
 	
-	// The node are iterated first
+	// The nodes are iterated first
 	$resultsList = $dom->getElementsByTagName('node');
 
 	$pointCoord = array();
@@ -69,6 +77,7 @@ if($result)
 			{
 				$parkingAttr[$tagList->item($numTag)->getAttribute("k")] = $tagList->item($numTag)->getAttribute("v");
 			}
+			// a node is bicycle parking it contains tag amenity = bicycle_parking
 			if($tagList->item($numTag)->getAttribute("k") == "amenity" and $tagList->item($numTag)->getAttribute("v") == "bicycle_parking")
 			{
 				$isAParking = true;
@@ -77,19 +86,14 @@ if($result)
 		
 		$parkingAttr["geom"] = "POINT (".$place->getAttribute('lon')." ".$place->getAttribute('lat').")";
 		
-		//if(isset($parkingAttr["amenity"]) && $parkingAttr["amenity"] == "bicycle_parking")
 		if($isAParking)
 		{
-			//$rs = Database::getConn()->Execute("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom) VALUES ('".$parkingAttr["obj_id"]."',".$parkingAttr["capacity"].",'".$parkingAttr["covered"]."','".$parkingAttr["bicycle_parking"]."','".$parkingAttr["access"]."',st_geomfromtext('POINT (".$parkingAttr["x"]." ".$parkingAttr["y"].")',4326))");
-			//$rs = Database::getConn()->Execute("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext('POINT (:x :y)',4326))",$parkingAttr);
-			//$geomString = "POINT ({$parkingAttr["x"]} {$parkingAttr["y"]})";
-			//$rs = Database::getConn()->Execute("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom) VALUES (:,?,?,?,?,st_geomfromtext(?,4326))",array($parkingAttr["obj_id"],$parkingAttr["capacity"],$parkingAttr["covered"],$parkingAttr["bicycle_parking"],$parkingAttr["access"],$geomString));
 			$insertNodeParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp)");
 			$insertNodeParking->execute($parkingAttr);
 		}
 	}
 
-
+	// then, we fetch the ways, bicycle parkings may be described as polygons
 	$resultsList = $dom->getElementsByTagName('way');
 	for($numWay = 0; $numWay < $resultsList->length; $numWay++)
 	{
@@ -107,13 +111,14 @@ if($result)
 			{
 				$parkingAttr[$tagList->item($numTag)->getAttribute("k")] = $tagList->item($numTag)->getAttribute("v");
 			}
+			// a node is bicycle parking it contains tag amenity = bicycle_parking
 			if($tagList->item($numTag)->getAttribute("k") == "amenity" and $tagList->item($numTag)->getAttribute("v") == "bicycle_parking")
 			{
 				$isAParking = true;
 			}
 		}
 		
-		
+		// bounding box calculation, based on the nodes that make up the polygon
 		$xMin = 0;$xMax = 0; $yMin = 0;$yMax = 0; 
 		$nodeRefList = $place->getElementsByTagName('nd');
 		for($numNode = 0; $numNode < $nodeRefList->length; $numNode++)
@@ -135,27 +140,25 @@ if($result)
 			}
 		}
 		
-		
-		//$parkingAttr["x"] = ($xMin+$xMax)/2;
-		//$parkingAttr["y"] = ($yMin+$yMax)/2;
-		
-		
+		// the parking in is located on the centre of the bounding box
 		$parkingAttr["geom"] = "POINT (".(($xMin+$xMax)/2)." ".(($yMin+$yMax)/2).")";
-		//$parkingAttr["geom"] = "POINT ({$parkingAttr["x"]} {$parkingAttr["y"]})";
 		
 		
-		//if(isset($parkingAttr["amenity"]) && $parkingAttr["amenity"] == "bicycle_parking")
 		if($isAParking)
 		{
-			//$rs = Database::getConn()->Execute("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom) VALUES ('".$parkingAttr["obj_id"]."',".$parkingAttr["capacity"].",'".$parkingAttr["covered"]."','".$parkingAttr["bicycle_parking"]."','".$parkingAttr["access"]."',st_geomfromtext('POINT (".$parkingAttr["x"]." ".$parkingAttr["y"].")',4326))");
-			//$geomString = "POINT ({$parkingAttr["x"]} {$parkingAttr["y"]})";
-			//$rs = Database::getConn()->Execute("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom) VALUES (?,?,?,?,?,st_geomfromtext(?,4326))",array($parkingAttr["obj_id"],$parkingAttr["capacity"],$parkingAttr["covered"],$parkingAttr["bicycle_parking"],$parkingAttr["access"],$geomString));
 			$insertWayParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp)");
 			$insertWayParking->execute($parkingAttr);
 		}
-		//echo print_r($parkingAttr)."<br>";
 	}
 	
+	// If the zone filter is deactivated the pv_zones table should contain one geometry that contains the whole world
+	if(! MODE_ZONE_FILTER)
+	{
+		$PDO->exec("TRUNCATE TABLE pv_zones");	
+		$PDO->exec("insert into pv_zones values ('default','Default',0,1,1,st_multi(st_expand(ST_GeomFromText('POINT(0 0)',4326),90)))");	
+	}
+	
+	// The zone_id of each parking(table pv_parkings) is calculated, according to the geometries in pv_zones
 	$PDO->exec("update pv_parkings set zone_id = rel.zone_id
 	from (select Z.zone_id,obj_id from pv_zones Z,pv_parkings where st_contains(geom,the_geom)) as rel
 	where pv_parkings.obj_id = rel.obj_id");
@@ -163,44 +166,38 @@ if($result)
 	// All informal parking are deleted from the database
 	$PDO->exec("DELETE FROM pv_parkings WHERE parking_type = 'informal'");
 
-		
+	/**
+		STEP 2 : ISOCHRONE AREAS GENERATION
+	*/	
 	$PDO->exec("TRUNCATE TABLE pv_parking_dist_zones");	
-
 	
-	$sqlDistZones = "insert into pv_parking_dist_zones
-		select zone_id,:dist,st_difference(the_geom,(select st_union(geom) from pv_parking_dist_zones))  from (
-		select zone_id,ST_Multi(st_intersection((Z.geom),(select st_transform(st_union(st_buffer(st_transform(the_geom,:proj),:dist2)),4326) from pv_parkings))) as the_geom
-		from pv_zones Z)
-		sr where st_geometrytype(the_geom) = 'ST_MultiPolygon'";
-
-
 	$firstTime = true;
+	// Polygons are computed given several distance thresholds
 	foreach($DISTANCE_LEVELS as $distElt)
 	{
-		echo $distElt['dist']."<br>";
-		if($distElt['dist'] != 'beyond')
-		{
-			
-			if($firstTime)
-				$areaSelector = "the_geom";
-			else
-				$areaSelector = "st_difference(the_geom,(select st_union(geom) from pv_parking_dist_zones))";
-			$sqlDistZones = "insert into pv_parking_dist_zones
-				select zone_id,:dist,".$areaSelector."  from (
-				select zone_id,ST_Multi(st_intersection((Z.geom),(select st_transform(st_union(st_buffer(st_transform(the_geom,:proj),:dist2)),4326) from pv_parkings where access <> 'private'))) as the_geom
-				from pv_zones Z	)
-				sr where st_geometrytype(the_geom) = 'ST_MultiPolygon'";
+		if($firstTime)
+			// on the first time, we calculate the area around the parking, with the first threshold
+			$areaSelector = "the_geom";
+		else
+			// then, the geometries must not overlap with the existing geometries (lesser threshold)
+			$areaSelector = "st_difference(the_geom,(select st_union(geom) from pv_parking_dist_zones))";
 		
-			$queryDistZones = $PDO->prepare($sqlDistZones);
-			$queryDistZones->bindValue(':proj', (int)DIST_PROJ);
-			$queryDistZones->bindValue(':dist', $distElt['dist']);
-			$queryDistZones->bindValue(':dist2', $distElt['dist']);
-			$queryDistZones->execute();
-			$firstTime = true;
-		}
+		// Polygons are generated given the parkings, a distance threshold, and the local boundaires (pv_zones.geom)
+		$sqlDistZones = "insert into pv_parking_dist_zones
+			select zone_id,:dist,".$areaSelector."  from (
+			select zone_id,ST_Multi(st_intersection((Z.geom),(select st_transform(st_union(st_buffer(st_transform(the_geom,:proj),:dist2)),4326) from pv_parkings where access <> 'private'))) as the_geom
+			from pv_zones Z	)
+			sr where st_geometrytype(the_geom) = 'ST_MultiPolygon'";
+	
+		$queryDistZones = $PDO->prepare($sqlDistZones);
+		$queryDistZones->bindValue(':proj', (int)DIST_PROJ);
+		$queryDistZones->bindValue(':dist', $distElt['dist']);
+		$queryDistZones->bindValue(':dist2', $distElt['dist']);
+		$queryDistZones->execute();
+		$firstTime = true;
 	}
 
-
+	
 }
 
 

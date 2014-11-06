@@ -25,17 +25,7 @@ SET default_with_oids = false;
 -- Name: pv_zones; Type: TABLE; Schema: public; Owner: emmanuel; Tablespace: 
 --
 
-CREATE TABLE pv_zones (
-    zone_id character varying(20) NOT NULL,
-    label character varying(32),
-    osm_id numeric,
-    active integer,
-    visible_default integer,
-    geom geometry(MultiPolygon,4326)
-);
-
-
-ALTER TABLE public.pv_zones OWNER TO emmanuel;
+TRUNCATE TABLE pv_zones;
 
 --
 -- Data for Name: pv_zones; Type: TABLE DATA; Schema: public; Owner: emmanuel
@@ -67,15 +57,10 @@ COPY pv_zones (zone_id, label, osm_id, active, visible_default, geom) FROM stdin
 \.
 
 
---
--- Name: pv_zones_pkey; Type: CONSTRAINT; Schema: public; Owner: emmanuel; Tablespace: 
---
+
 
 ALTER TABLE ONLY pv_zones
     ADD CONSTRAINT pv_zones_pkey PRIMARY KEY (zone_id);
 
 
---
--- PostgreSQL database dump complete
---
 

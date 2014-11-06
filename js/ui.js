@@ -115,6 +115,7 @@ function mapInit(){
 		badObjLayer.addLayer(geojson);
 	});
 	
+	// Pseudo-isochrone layer
 	surroundingAreaLayer = L.featureGroup();//.addTo(map);
 	map.removeLayer(surroundingAreaLayer);
 	// all click are redirected to the map object
@@ -130,19 +131,22 @@ function mapInit(){
 		map.addLayer(surroundingAreaLayer);
 	});
 	
-	
-	boundariesLayer = L.featureGroup();//.addTo(map);
-	map.removeLayer(boundariesLayer);
-	// this layer will be loaded on demand
-	layerLoader.addLayer(boundariesLayer,'boundaries',function(data){
-		var geojson = L.geoJson(data,{
-			style: function (feature) {
-			return feature.properties && feature.properties.style;
-			}
+	// This layer displays the local boundaries, as defined in pv_zones table
+	if(CLIENT_CONF.zoneFilter)
+	{
+		boundariesLayer = L.featureGroup();//.addTo(map);
+		map.removeLayer(boundariesLayer);
+		// this layer will be loaded on demand
+		layerLoader.addLayer(boundariesLayer,'boundaries',function(data){
+			var geojson = L.geoJson(data,{
+				style: function (feature) {
+				return feature.properties && feature.properties.style;
+				}
+			});
+			boundariesLayer.addLayer(geojson);
+			map.addLayer(boundariesLayer);
 		});
-		boundariesLayer.addLayer(geojson);
-		map.addLayer(boundariesLayer);
-	});
+	}
 	
 	// Control layer
 	var overlays = {};
@@ -150,8 +154,10 @@ function mapInit(){
 	overlays[CLIENT_CONF.labels.badObjLayer] = badObjLayer;
 	overlays[CLIENT_CONF.labels.surroundingAreaLayer] = surroundingAreaLayer;
 	overlays[CLIENT_CONF.labels.privateLayer] = privateLayer;
-	overlays[CLIENT_CONF.labels.boundariesLayer] = boundariesLayer;
-	
+	if(CLIENT_CONF.zoneFilter)
+	{
+		overlays[CLIENT_CONF.labels.boundariesLayer] = boundariesLayer;
+	}
 	
 	L.control.layers(baseLayers, overlays).addTo(map);
 	L.control.scale({imperial:false,maxWidth:200}).addTo(map);
@@ -218,9 +224,6 @@ function mapInit(){
 	
 	
 	
-	// load the parking layer
-	//loadParkings();
-	
 	// Push button initialisation
 	// When the button is clicked, I simulate a click on the rectangle draw tool in Leaflet.draw
 	$("#drawRect").click(function(){
@@ -270,31 +273,31 @@ function mapInit(){
 			$(".ui-accordion-content").css("max-height",(event.newSize.y-CLIENT_CONF.reservedHeight)+"px");
 	});
 	
-	
-	$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'zones'},
-		success:function(data)
-		{
-			for(var numZone = 0; numZone < data.length; numZone++)
+	if(CLIENT_CONF.zoneFilter)
+	{
+		$.ajax({
+			dataType:'json',
+			url:'api.php',
+			data:{get:'zones'},
+			success:function(data)
 			{
-				$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'">'+data[numZone].label+'<br>');
+				for(var numZone = 0; numZone < data.length; numZone++)
+				{
+					$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'">'+data[numZone].label+'<br>');
+				}
 			}
-		}
-	});
-	
-	$("#zonesApply").click(function(){
-		layerLoader.reloadAll();
-	});
-	$("#zonesAll").click(function(){
-		$(".zoneSelector").attr("checked",true);
-	});
-	$("#zonesNone").click(function(){
-		$(".zoneSelector").attr("checked",false);
-	});
-	
-	
+		});
+		
+		$("#zonesApply").click(function(){
+			layerLoader.reloadAll();
+		});
+		$("#zonesAll").click(function(){
+			$(".zoneSelector").attr("checked",true);
+		});
+		$("#zonesNone").click(function(){
+			$(".zoneSelector").attr("checked",false);
+		});
+	}
 }
 
 /**
@@ -315,86 +318,6 @@ function onMapClick(e) {
 		}
 		});
 	}
-}
-
-function loadParkings()
-{
-	$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'list'},
-		success:function(data)
-		{
-			var geojson = L.geoJson(data, {
-				pointToLayer: function (feature, latlng) {
-					var myIcon = L.divIcon({className: 'my-div-icon',
-						'html':'<img src="img/parking_bicycle.png" class="parking_icon"><span class="capacite">'+feature.properties.capacity+'</span>',
-						popupAnchor:  [0, -15]
-						});
-					return L.marker(latlng, {icon: myIcon});
-				},
-				onEachFeature :function (feature, layer) {
-					layer.bindPopup(feature.properties.popup,{closeButton:false});
-				}
-			});
-			
-			parkingsLayer.addLayer(geojson);
-			
-			map.fitBounds(parkingsLayer.getBounds());
-		}
-	});
-	$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'stats'},
-		success:function(data)
-		{
-			$("#stats_global").html(data.content);
-		}
-	});
-	$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'zones'},
-		success:function(data)
-		{
-			for(var numZone = 0; numZone < data.length; numZone++)
-			{
-				$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'">'+data[numZone].label+'<br>');
-			}
-		}
-	});
-	/*$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'badObj'},
-		success:function(data)
-		{
-			var geojson = L.geoJson(data, {
-				pointToLayer: function (feature, latlng) {
-					return L.marker(latlng, {icon: badParkingIco});
-				},
-				onEachFeature :function (feature, layer) {
-					layer.bindPopup(feature.properties.label);
-				}
-			});
-			badObjLayer.addLayer(geojson);
-		}
-	});*/
-	/*$.ajax({
-		dataType:'json',
-		url:'api.php',
-		data:{get:'surroundingArea'},
-		success:function(data)
-		{
-			var geojson = L.geoJson(data,{
-				style: function (feature) {
-				return feature.properties && feature.properties.style;
-				}
-			});
-			surroundingAreaLayer.addLayer(geojson);
-		}
-	});*/
 }
 
 // This object load layers on demand, that is to say, when the user requires it to be displayed
@@ -447,18 +370,21 @@ var layerLoader = {
 	getSelectedZones : function(numLayer)
 	{
 		var zoneString = "";
-		$(".zoneSelector").each(function(chkbox){
-			if($(this).is(':checked')){
-				var zoneId = $(this).attr("id").replace("zone","");
-				if(! zoneId in this.data[numLayer])
-				{
-					if(zoneString == "")
-						zoneString = zoneId;
-					else
-						zoneString += ","+zoneId;
+		if(CLIENT_CONF.zoneFilter)
+		{
+			$(".zoneSelector").each(function(chkbox){
+				if($(this).is(':checked')){
+					var zoneId = $(this).attr("id").replace("zone","");
+					if(! zoneId in this.data[numLayer])
+					{
+						if(zoneString == "")
+							zoneString = zoneId;
+						else
+							zoneString += ","+zoneId;
+					}
 				}
-			}
-		});
+			});
+		}
 		return zoneString;
 	}
 };
@@ -495,15 +421,18 @@ var popupManager = {
 function getSelectedZones()
 {
 	var zoneString = "";
-	$(".zoneSelector").each(function(chkbox){
-		if($(this).is(':checked')){
-			var zoneId = $(this).attr("id").replace("zone","");
-			if(zoneString == "")
-				zoneString = zoneId;
-			else
-				zoneString += ","+zoneId;
-		}
-	});
+	if(CLIENT_CONF.zoneFilter)
+	{
+		$(".zoneSelector").each(function(chkbox){
+			if($(this).is(':checked')){
+				var zoneId = $(this).attr("id").replace("zone","");
+				if(zoneString == "")
+					zoneString = zoneId;
+				else
+					zoneString += ","+zoneId;
+			}
+		});
+	}
 	return zoneString;
 }
 

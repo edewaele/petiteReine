@@ -17,6 +17,10 @@ CREATE TABLE public.pv_zones
   CONSTRAINT pv_zones_pkey PRIMARY KEY (zone_id)
 );
 
+-- in the basic setup, the zone mechanism is not activated
+-- to bypass it the data-retrieving queries, we create a single zone that covers the whole earth
+insert into pv_zones values ('default','Default',0,1,1,st_multi(st_expand(ST_GeomFromText('POINT(0 0)',4326),90)));
+
 -- The list of bicycle parkings
 -- This table is filled by the import script
 CREATE TABLE pv_parkings
