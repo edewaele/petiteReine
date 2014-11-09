@@ -3,7 +3,7 @@ require 'conf.php';
 ?>
 <html>
 <head>
-<title>Parkings vélo</title>
+<title><?php echo $LABELS["pageTitle"];?></title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
 
@@ -44,23 +44,23 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 <body>
 <div id="map"></div>
 
-<input type="button" value="À propos" id="aboutButton">
+<input type="button" value="<?php echo $LABELS["aboutDialog.button"];?>" id="aboutButton">
 
 <div id="leftPanel">
-	<h3>Statistiques</h3>
+	<h3><?php echo $LABELS["panel.stats"];?></h3>
 	<div>
 		<!--<h1>Statistiques</h1>-->
 		<div id="stats_global"></div>
 		<div id="zone_analysis">
-			<h4>Analyse par zone</h4>
+			<h4><?php echo $LABELS["panel.stats.byZone"];?></h4>
 			<div id="stats_zone"></div>
-			<p><input type="button" id="drawRect" value="Tracer rectangle">
-			<input type="button" id="drawPolygon" value="Polygone">
-			<input type="button" id="eraseZone" value="Effacer"></P>
+			<p><input type="button" id="drawRect" value="<?php echo $LABELS["panel.stats.drawRectangle"];?>">
+			<input type="button" id="drawPolygon" value="<?php echo $LABELS["panel.stats.drawPolygon"];?>">
+			<input type="button" id="eraseZone" value="<?php echo $LABELS["panel.stats.clear"];?>"></P>
 		</div>
 	</div>
 	<?php if(MODE_ZONE_FILTER){?>
-	<h3>Communes</h3>
+	<h3><?php echo $LABELS["panel.zone"];?></h3>
 	<div>
 		<input type="button" id="zonesAll" value="Tout" />
 		<input type="button" id="zonesNone" value="Rien" />
@@ -68,14 +68,14 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 		<div id="zoneList"></div>
 	</div>
 	<?php }?>
-	<h3>Légende / aide</h3>
+	<h3><?php echo $LABELS["panel.help"];?></h3>
 	<div id="help">
-	<?php include("locale/fr-fr/help.html"); ?>
+	<?php include("locale/".$CURRENT_LOCALE."/help.html"); ?>
 	</div>
 </div>
 
-<div id="aboutDialog" title="À propos de cette carte">
-<?php include("locale/fr-fr/about.html"); ?>
+<div id="aboutDialog" title="<?php echo $LABELS["aboutDialog.title"];?>">
+<?php include("locale/".$CURRENT_LOCALE."/about.html"); ?>
 </div>
 </body>
 </html>

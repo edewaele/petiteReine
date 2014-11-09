@@ -76,9 +76,9 @@ if(isset($_REQUEST["get"]))
 			
 			// Capacity
 			if($rs["capacity"] > 0)
-				$obj_label .= $rs["capacity"]." places";
+				$obj_label .= sprintf($LABELS["map.parking.capacity"],$rs["capacity"]);
 			else 
-				$obj_label .= "nombre de places inconnu";
+				$obj_label .= $LABELS["map.parking.noCapacity"];
 			
 			// is the parking covered
 			if(isset($COVERED_LABEL[$rs["covered"]]))
@@ -118,7 +118,7 @@ if(isset($_REQUEST["get"]))
 		$queryDistance->execute(array(":proj"=>DIST_PROJ,":proj2"=>DIST_PROJ,":point"=>$geomString));
 		if($rs = $queryDistance->fetch())
 		{
-			$result = array("distance"=>floor($rs["distance"])." mètres du parking le plus proche (à vol d'oiseau)");
+			$result = array("distance"=>sprintf($LABELS["map.distanceToolLabel"],floor($rs["distance"])));
 		}
 		
 		header('Content-type: application/json');
@@ -149,7 +149,7 @@ if(isset($_REQUEST["get"]))
 			if($rs = $queryArea->fetch())
 			{
 				$areaInSqrKm = $rs["area"] / 1000 / 1000;
-				$stats .= "Surface : ". number_format($areaInSqrKm,2,$DEC_POINT,$THOUSAND_SEP) ." km²<br>";
+				$stats .= sprintf($LABELS['stats.area'],number_format($areaInSqrKm,2,$DEC_POINT,$THOUSAND_SEP));
 			}
 		
 			$sqlStats = "select parking_type,count(*) as n,sum(capacity) as c from pv_parkings where st_contains(st_geomfromgeojson(:geojson),the_geom) and access <> 'private' ".getZoneFilter($_REQUEST["zones"])." group by parking_type";
@@ -158,8 +158,10 @@ if(isset($_REQUEST["get"]))
 		}
 		else
 		{
+			// otherwise, the global statistics are calculated
 			$queryStats = $PDO->query("select parking_type,count(*) as n,sum(capacity) as c from pv_parkings where access <> 'private' ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"")." group by parking_type");
 		}
+		// counting parkings and total capacity by type
 		while($rs = $queryStats->fetch())
 		{
 			if($rs["parking_type"] == "")
@@ -183,17 +185,21 @@ if(isset($_REQUEST["get"]))
 		
 		if($numberParkingsTotal > 0)
 		{
-			$stats .= "$capacityParkingsTotal places ($numberParkingsTotal parkings) dont :<br>";
+			// total number of parkings
+			$stats .= sprintf($LABELS['stats.total'],$capacityParkingsTotal,$numberParkingsTotal);
 			$stats .= "<ul>";
-			if($numberParkings["stands"])$stats .= "<li>{$capacityParkings["stands"]} places en arceaux ({$numberParkings["stands"]})</li>";
-			if($numberParkings["wall_loops"])$stats .= "<li>{$capacityParkings["wall_loops"]} places en pince-roue ({$numberParkings["wall_loops"]})</li>";
-			if($numberParkings["shed"])$stats .= "<li>{$capacityParkings["shed"]} places en abri ({$numberParkings["shed"]})</li>";
-			if($numberParkings["other"])$stats .= "<li>{$capacityParkings["other"]} places sur autres types de parking ({$numberParkings["other"]})</li>";
-			if($numberParkings["unknown"])$stats .= "<li>{$capacityParkings["unknown"]} places sur parkings de type inconnu ({$numberParkings["unknown"]})</li>";
+			// number of parkings (and capacity) by type
+			foreach($LABELS['stats.byType'] as $type => $label)
+			{
+				if($numberParkings[$type])
+				{
+					$stats .= "<li>".sprintf($label,$capacityParkings[$type],$numberParkings[$type])."</li>";
+				}
+			}
 			$stats .= "</ul>";
 		}
 		else
-			$stats = "Aucune donnée";
+			$stats = $LABELS["stats.noData"];
 		
 		
 		$result["content"] = $stats;
@@ -217,11 +223,11 @@ if(isset($_REQUEST["get"]))
 			$label = "";
 			if($rs["type"] == "")
 			{
-				$label .= "Type de parking inconnu. ";
+				$label .= $LABELS["map.bad.noType"];
 			}
 			if($rs["capacity"] == 0)
 			{
-				$label .= "Nombre de places inconnu. ";
+				$label .= $LABELS["map.bad.noCapacity"];
 			}
 			
 			$feature = array(

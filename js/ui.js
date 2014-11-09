@@ -203,7 +203,7 @@ function mapInit(){
 			$.ajax({
 				dataType:'json',
 				url:'api.php',
-				data:{get:'stats',geom:geometryRect},
+				data:{get:'stats',geom:geometryRect,zones:getSelectedZones()},
 				success:function(data)
 				{
 					$("#stats_zone").html(data.content);

@@ -40,8 +40,7 @@ array(
 )
 );
 $context = stream_context_create($opts);
-//$result = file_get_contents(OAPI_URL, false, $context);
-$result = file_get_contents("http://overpass.osm.rambler.ru/cgi/interpreter", false, $context);
+$result = file_get_contents(OAPI_URL, false, $context);
 
 
 if($result)
@@ -169,6 +168,7 @@ if($result)
 	/**
 		STEP 2 : ISOCHRONE AREAS GENERATION
 	*/	
+	
 	$PDO->exec("TRUNCATE TABLE pv_parking_dist_zones");	
 	
 	$firstTime = true;
@@ -196,7 +196,7 @@ if($result)
 		$queryDistZones->execute();
 		$firstTime = true;
 	}
-
+	
 	
 }
 

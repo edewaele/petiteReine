@@ -17,6 +17,7 @@ body{
 .capacite{font-size:10pt;float:right}
 
 .parking_icon{height:18pt}
+.cluster_icon{height:20pt}
 
 #leftPanel{
 	position:absolute;
@@ -46,6 +47,8 @@ h1{font-size:120%}
 .leaflet-draw-actions{display:none}
 .ui-accordion-content{padding:4px !important;max-height:600px}
 
+.my-div-icon{text-shadow: 0px 0px 4px #FFF;color:#000}
+.my-div-icon span{background-color: rgba(255, 255, 255, 0.3)}
 
 @media screen and (max-width: 640px) {
   #leftPanel{left:0px;top :0px}

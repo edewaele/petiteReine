@@ -1,5 +1,9 @@
 <?php
 require_once 'lib/mobileDetect/Mobile_Detect.php';
+require_once 'functions.php';
+
+
+
 // In this file, we are going to configure the app step by step
 
 /**
@@ -27,8 +31,18 @@ define('OSM_ZONE',1663056);
  */
 define('DIST_PROJ',27572);
 
+/*
+	STEP 3 : LOCALE SETTINGS
+*/
+$LOCALES = array(
+	'fr'=>'fr-fr',
+	'default'=>'default'// the defaut locale is used of the language codes above is recognised (english labels).
+);
+$CURRENT_LOCALE = getLocale($LOCALES);
+require_once 'locale/'.$CURRENT_LOCALE.'/labels.php';
+
 /**
-	STEP 3 : ADVANCED SETTINGS
+	STEP 4 : ADVANCED SETTINGS
 */
 // Activate the zone filter
 // true => you must fill the pv_zones tables, and the zone selector will display its contents
@@ -40,27 +54,13 @@ define('MODE_ZONE_FILTER',false);
 define('OAPI_URL',"http://overpass-api.de/api/interpreter");
 
 // Here are set the labels for each type of parking (OSM key : bicycle_parking), as displayed is popups
-$PARKING_LABEL = array(
-	'stands'=> 'Arceaux',
-	'shed' => 'Abri à vélos',
-	'wall_loops'=>'Pince-roues',
-	'empty' => 'Type inconnu',
-	'other' => 'Autre type'
-);
+$PARKING_LABEL = $LABELS['map.parking.type'];
 
 // In the popup, the label saying whether the parking is covered or not (OSM key : covered)
-$COVERED_LABEL = array(
-	'yes'=> 'couvert',
-	'no' => 'non couvert'
-);
+$COVERED_LABEL = $LABELS['map.parking.coveredLabel'];
 
 // In the popup, the label saying whether the parking is open to everyone or categories of people (OSM key : access)
-$ACCESS_LABEL = array(
-	'private'=> '(privé)',
-	'customers'=> '(réservé à la clientèle ou usagers)',
-	'other' => '',
-	'empty' => ''
-);
+$ACCESS_LABEL = $LABELS['map.parking.accessLabel'];
 
 // decimal separator, must be set according to the locale
 $DEC_POINT = ",";
@@ -80,13 +80,7 @@ $DISTANCE_LEVELS = array(
 $detect = new Mobile_Detect;
 //
 $CLIENT_CONF = array(
-	'labels'=>array(
-		'parkingsLayer'=>'Parkings',
-		'badObjLayer'=>'Données à corriger',
-		'surroundingAreaLayer'=>'Couverture en parking vélo',
-		'privateLayer'=>'Parkings privés',
-		'boundariesLayer'=>"Limites communales"
-	),
+	'labels'=>$LABELS["map.layerLabels"],
 	'popupTimeout'=>2000,
 	'maxClusterRadius'=>70,
 	'disableClusteringAtZoom'=>18,
