@@ -216,7 +216,11 @@ if(isset($_REQUEST["get"]))
 		'features' => array()
 		);
 		
-		$sqlBadParkings = "SELECT obj_id,capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson FROM pv_parkings where (capacity = 0 or parking_type = '') ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
+		/* There is warning about data quality when :
+		 - there is no capacity
+		 - the type is unknown
+		 - there is another bicycle parking with equal coordinates */
+		$sqlBadParkings = "SELECT obj_id,capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson,(select count(*) from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id) as doubloons FROM pv_parkings P where (capacity = 0 or parking_type = '' or  exists(select * from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id)) ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
 		$queryBadParkings = $PDO->query($sqlBadParkings);
 		while($rs = $queryBadParkings->fetch())
 		{
@@ -228,6 +232,10 @@ if(isset($_REQUEST["get"]))
 			if($rs["capacity"] == 0)
 			{
 				$label .= $LABELS["map.bad.noCapacity"];
+			}
+			if($rs["doubloons"] > 0)
+			{
+				$label .= $LABELS["map.bad.doubloon"];
 			}
 			if(EDIT_JOSM)
 			{

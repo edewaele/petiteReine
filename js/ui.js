@@ -100,7 +100,7 @@ function mapInit(){
 	// this layers displays the parking with missing information
 	badObjLayer = L.markerClusterGroup({	// the layer is clustered just like the parking layer
 			maxClusterRadius: CLIENT_CONF.maxClusterRadius,
-			disableClusteringAtZoom :CLIENT_CONF.disableClusteringAtZoom,
+			disableClusteringAtZoom :15,
 			iconCreateFunction: function (cluster) {
 				var markers = cluster.getAllChildMarkers();
 				var htmlCode = "<div><span>"+markers.length+"</div></span>";// The circle display the number of parkings that lack information				
