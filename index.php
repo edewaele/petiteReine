@@ -77,5 +77,7 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 <div id="aboutDialog" title="<?php echo $LABELS["aboutDialog.title"];?>">
 <?php include("locale/".$CURRENT_LOCALE."/about.html"); ?>
 </div>
+
+<iframe id="hiddenIframe" name="hiddenIframe" style="display:none"></iframe>
 </body>
 </html>

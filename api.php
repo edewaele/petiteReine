@@ -216,7 +216,7 @@ if(isset($_REQUEST["get"]))
 		'features' => array()
 		);
 		
-		$sqlBadParkings = "SELECT capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson FROM pv_parkings where (capacity = 0 or parking_type = '') ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
+		$sqlBadParkings = "SELECT obj_id,capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson FROM pv_parkings where (capacity = 0 or parking_type = '') ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
 		$queryBadParkings = $PDO->query($sqlBadParkings);
 		while($rs = $queryBadParkings->fetch())
 		{
@@ -228,6 +228,10 @@ if(isset($_REQUEST["get"]))
 			if($rs["capacity"] == 0)
 			{
 				$label .= $LABELS["map.bad.noCapacity"];
+			}
+			if(EDIT_JOSM)
+			{
+				$label .= '<br><a href="http://localhost:8111/load_object?objects='.$rs["obj_id"].'" target="hiddenIframe">'.$LABELS["map.bad.edit"].'</a>';
 			}
 			
 			$feature = array(

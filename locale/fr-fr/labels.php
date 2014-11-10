@@ -46,6 +46,7 @@ $LABELS = array(
 	// Bad objects layer, error reasons
 	'map.bad.noType'=>"Type de parking inconnu. ", // no bicycle_parking key
 	'map.bad.noCapacity'=>"Nombre de places inconnu. ",// capacity is unknown
+	'map.bad.edit'=>"Modifier avec JOSM",
 	// statistics tool
 	'stats.noData'=> "Aucune donnée",
 	'stats.area'=>"Surface : %s km²<br>",

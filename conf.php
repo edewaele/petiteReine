@@ -49,6 +49,9 @@ require_once 'locale/'.$CURRENT_LOCALE.'/labels.php';
 // false => the feature is disabled, and the pv_zones tables will be flushed the next time import.php is launched
 define('MODE_ZONE_FILTER',false);
 
+// Display the link "Edit with JOSM", in the "Missing information" layer
+define('EDIT_JOSM',true);
+
 // URL of the Overpass API instance (see http://wiki.openstreetmap.org/wiki/Overpass_API)
 // Overpass API provides the list of bicycle parkings
 define('OAPI_URL',"http://overpass-api.de/api/interpreter");
