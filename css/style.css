@@ -19,6 +19,14 @@ body{
 .parking_icon{height:18pt}
 .cluster_icon{height:20pt}
 
+/* Red symboliser in the "Missing information" layer */
+.marker-cluster-bad div {
+    background-color: rgba(255, 0, 0, 0.6);
+}
+.marker-cluster-bad {
+    background-color: rgba(255, 0, 0, 0.6);
+}
+
 #leftPanel{
 	position:absolute;
 	left:10px;

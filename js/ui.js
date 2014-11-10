@@ -47,7 +47,7 @@ function mapInit(){
 						'html':'<img src="img/parking_bicycle.png" class="parking_icon"><span class="capacite">'+feature.properties.capacity+'</span>',
 						iconAnchor:  [9, 23]
 						});
-					return L.marker(latlng, {icon: myIcon});
+					return L.marker(latlng, {icon: myIcon,zIndexOffset:0});
 				},
 				onEachFeature :function (feature, layer) {
 					layer.bindPopup(feature.properties.popup,{closeButton:false,offset:[0,-20]});
@@ -98,7 +98,15 @@ function mapInit(){
 	});
 
 	// this layers displays the parking with missing information
-	badObjLayer = L.featureGroup().addTo(map);
+	badObjLayer = L.markerClusterGroup({	// the layer is clustered just like the parking layer
+			maxClusterRadius: CLIENT_CONF.maxClusterRadius,
+			disableClusteringAtZoom :CLIENT_CONF.disableClusteringAtZoom,
+			iconCreateFunction: function (cluster) {
+				var markers = cluster.getAllChildMarkers();
+				var htmlCode = "<div><span>"+markers.length+"</div></span>";// The circle display the number of parkings that lack information				
+				return L.divIcon({ html: htmlCode, className: 'marker-cluster-bad marker-cluster', iconSize: L.point(40, 40) });
+			}	
+			}).addTo(map);
 	popupManager.addLayer(badObjLayer);		
 	map.removeLayer(badObjLayer);
 	
@@ -106,7 +114,7 @@ function mapInit(){
 	layerLoader.addLayer(badObjLayer,'badObj',function(data){
 		var geojson = L.geoJson(data, {
 			pointToLayer: function (feature, latlng) {
-				return L.marker(latlng, {icon: badParkingIco});
+				return L.marker(latlng, {icon: badParkingIco,zIndexOffset:100});// zIndexOffset makes this layer appear above the parking layer
 			},
 			onEachFeature :function (feature, layer) {
 				layer.bindPopup(feature.properties.label,{closeButton:false,offset:[0,-20]});
