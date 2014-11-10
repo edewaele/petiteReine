@@ -167,9 +167,9 @@ function mapInit(){
 		overlays[CLIENT_CONF.labels.boundariesLayer] = boundariesLayer;
 	}
 	
+	L.control.zoom({position:'topright'}).addTo(map);
 	L.control.layers(baseLayers, overlays).addTo(map);
 	L.control.scale({imperial:false,maxWidth:200}).addTo(map);
-	L.control.zoom({position:'topright'}).addTo(map);
 	
 
 	

@@ -38,7 +38,7 @@ body{
 
 #aboutButton{
 	position:absolute;
-	right:70px;
+	right:50px;
 	top :10px;
 	z-index:99;
 }
