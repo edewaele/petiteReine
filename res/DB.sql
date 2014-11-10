@@ -3,6 +3,7 @@
 DROP TABLE IF EXISTS pv_parkings;
 DROP TABLE IF EXISTS pv_parking_dist_zones;
 DROP TABLE IF EXISTS pv_zones;
+DROP TABLE IF EXISTS pv_import_trace;
 
 -- The zone represent local authorities, with their boundaries
 -- You have to add data in the table before launching the import script
@@ -46,4 +47,20 @@ CREATE TABLE pv_parking_dist_zones
   distance integer NOT NULL,
   geom geometry(MultiPolygon,4326),
   CONSTRAINT pv_parking_dist_zones_pkey PRIMARY KEY (zone_id, distance)
+);
+
+-- Log table for the import batch
+CREATE TABLE pv_import_trace
+(
+  trace_id integer NOT NULL DEFAULT nextval('pv_import_trace_trace_id_seq'::regclass),
+  status boolean,
+  startdt timestamp with time zone,
+  duration numeric,
+  area integer,
+  number_parking integer,
+  total_capacity integer,
+  number_nocapacity integer,
+  number_notype integer,
+  number_problem integer,
+  CONSTRAINT pv_import_trace_pkey PRIMARY KEY (trace_id)
 );
