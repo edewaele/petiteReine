@@ -217,10 +217,10 @@ if(isset($_REQUEST["get"]))
 		);
 		
 		/* There is warning about data quality when :
-		 - there is no capacity
+		 - there is no capacity (and it is not in private access, it is often impossible to determine the capacity in such a case)
 		 - the type is unknown
 		 - there is another bicycle parking with equal coordinates */
-		$sqlBadParkings = "SELECT obj_id,capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson,(select count(*) from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id) as doubloons FROM pv_parkings P where (capacity = 0 or parking_type = '' or  exists(select * from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id)) ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
+		$sqlBadParkings = "SELECT obj_id,capacity,parking_type as type,ST_AsGeoJSON(public.ST_Transform((the_geom),4326),6) AS geojson,(select count(*) from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id) as doubloons FROM pv_parkings P where (capacity = 0  and  access<>'private' or parking_type = '' or  exists(select * from pv_parkings SR where P.the_geom = SR.the_geom and P.obj_id <> SR.obj_id)) ".getZoneFilter(isset($_REQUEST["zones"])?$_REQUEST["zones"]:"");
 		$queryBadParkings = $PDO->query($sqlBadParkings);
 		while($rs = $queryBadParkings->fetch())
 		{
