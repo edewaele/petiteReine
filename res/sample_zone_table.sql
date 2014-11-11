@@ -58,9 +58,3 @@ COPY pv_zones (zone_id, label, osm_id, active, visible_default, geom) FROM stdin
 
 
 
-
-ALTER TABLE ONLY pv_zones
-    ADD CONSTRAINT pv_zones_pkey PRIMARY KEY (zone_id);
-
-
-

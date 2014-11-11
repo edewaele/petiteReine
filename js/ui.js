@@ -59,15 +59,6 @@ function mapInit(){
 			
 			map.fitBounds(parkingsLayer.getBounds());
 			
-			$.ajax({
-				dataType:'json',
-				url:'api.php',
-				data:{get:'stats',zones:getSelectedZones()},
-				success:function(data)
-				{
-					$("#stats_global").html(data.content);
-				}
-			});
 			parkingsLayer.layerLoaderLoaded =  true;
 	};
 	layerLoader.addLayer(parkingsLayer,'list',parkingLoad);
@@ -212,7 +203,7 @@ function mapInit(){
 			$.ajax({
 				dataType:'json',
 				url:'api.php',
-				data:{get:'stats',geom:geometryRect,zones:getSelectedZones()},
+				data:{get:'stats',geom:geometryRect,zones:layerLoader.getSelectedZones()},
 				success:function(data)
 				{
 					$("#stats_zone").html(data.content);
@@ -299,14 +290,23 @@ function mapInit(){
 		
 		$("#zonesApply").click(function(){
 			layerLoader.reloadAll();
+			$("#stats_zone").html("");
+			drawnItems.clearLayers();
+
 		});
-		$("#zonesAll").click(function(){
-			$(".zoneSelector").attr("checked",true);
+		/*$("#zonesAll").click(function(){
+			$(".zoneSelector").each(function(){
+				$(this).attr("checked",true);
+			});
 		});
 		$("#zonesNone").click(function(){
-			$(".zoneSelector").attr("checked",false);
-		});
+			$(".zoneSelector").each(function(){
+				$(this).attr("checked",false);
+			});
+		});*/
 	}
+	
+	layerLoader.updateZones();
 }
 
 /**
@@ -335,6 +335,7 @@ var layerLoader = {
 	loadFunctions:[],
 	requests:[],
 	data:[],
+	currentZones:[],
 	//  a new layer to be displayed on demand, with a request parameter and a function to be called to process the data
 	addLayer:function(layer,request,loadFunction){
 		layer.layerLoaderID = this.layers.length;
@@ -355,7 +356,7 @@ var layerLoader = {
 			$.ajax({	// AJAX request
 				dataType:'json',
 				url:'api.php',
-				data:{get:this.requests[layerNum],zones:getSelectedZones()},
+				data:{get:this.requests[layerNum],zones:this.getSelectedZones()},
 				success:function(data)
 				{	// call to the layer's function
 					parentObject.loadFunctions[layerNum](data);
@@ -365,6 +366,7 @@ var layerLoader = {
 		}
 	},
 	reloadAll:function(){
+		this.updateZones();
 		for(var numLayer = 0; numLayer <  this.layers.length; numLayer++)
 		{
 			var currentLayer = this.layers[numLayer];
@@ -384,17 +386,27 @@ var layerLoader = {
 			$(".zoneSelector").each(function(chkbox){
 				if($(this).is(':checked')){
 					var zoneId = $(this).attr("id").replace("zone","");
-					if(! zoneId in this.data[numLayer])
-					{
-						if(zoneString == "")
-							zoneString = zoneId;
-						else
-							zoneString += ","+zoneId;
-					}
+					if(zoneString == "")
+						zoneString = zoneId;
+					else
+						zoneString += ","+zoneId;
 				}
 			});
 		}
 		return zoneString;
+	},
+	updateZones:function()
+	{
+		this.currentZones = this.getSelectedZones();
+		$.ajax({
+			dataType:'json',
+			url:'api.php',
+			data:{get:'stats',zones:this.currentZones},
+			success:function(data)
+			{
+				$("#stats_global").html(data.content);
+			}
+		});
 	}
 };
 

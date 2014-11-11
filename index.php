@@ -60,10 +60,10 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 		</div>
 	</div>
 	<?php if(MODE_ZONE_FILTER){?>
-	<h3><?php echo $LABELS["panel.zone"];?></h3>
+	<h3><?php echo $LABELS["panel.zones"];?></h3>
 	<div>
-		<input type="button" id="zonesAll" value="Tout" />
-		<input type="button" id="zonesNone" value="Rien" />
+		<!--<input type="button" id="zonesAll" value="Tout" />
+		<input type="button" id="zonesNone" value="Rien" />-->
 		<input type="button" id="zonesApply" value="Appliquer" />
 		<div id="zoneList"></div>
 	</div>
