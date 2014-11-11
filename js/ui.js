@@ -10,6 +10,7 @@ function mapInit(){
 
 	var baseLayers = {
 	'OpenStreetMap Default': L.tileLayer.provider('OpenStreetMap.Mapnik'),
+	'OpenStreetMap France': L.tileLayer.provider('OpenStreetMap.France'),
 	'OpenStreetMap German Style': L.tileLayer.provider('OpenStreetMap.DE'),
 	'OpenStreetMap Black and White': L.tileLayer.provider('OpenStreetMap.BlackAndWhite'),
 	'OpenStreetMap H.O.T.': L.tileLayer.provider('OpenStreetMap.HOT'),
