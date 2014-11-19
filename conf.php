@@ -66,9 +66,9 @@ $COVERED_LABEL = $LABELS['map.parking.coveredLabel'];
 $ACCESS_LABEL = $LABELS['map.parking.accessLabel'];
 
 // decimal separator, must be set according to the locale
-$DEC_POINT = ",";
+define('DEC_POINT',",");
 // thousands separator, must be set according to the locale
-$THOUSAND_SEP = " ";
+define('THOUSAND_SEP'," ");
 
 
 // Isochrone generation parameters
@@ -81,6 +81,16 @@ $DISTANCE_LEVELS = array(
 );
 
 $detect = new Mobile_Detect;
+
+try {
+	$PDO = new PDO( 'pgsql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD );
+} catch ( Exception $e ) {
+	die("Unable to connect database");
+}
+// The initial map viewport is calculated according to the parkings that exist in the zones that are visible by default
+$queryViewPort = $PDO->query("select min(st_x(the_geom)) as xmin,max(st_x(the_geom)) as xmax,min(st_y(the_geom)) as ymin,max(st_y(the_geom)) as ymax from pv_parkings where zone_id in (select zone_id from pv_zones where visible_default = 1 and active = 1)");
+$viewPort = $queryViewPort->fetch();
+
 //
 $CLIENT_CONF = array(
 	'labels'=>$LABELS["map.layerLabels"],
@@ -90,7 +100,11 @@ $CLIENT_CONF = array(
 	'reservedHeight'=>150, // max height for an accordion block = map height - reservedHeight
 	'reservedHeightMobile'=>100, // max height for an accordion block = map height - reservedHeight (on a mobile device)
 	'isMobile'=>$detect->isMobile(),
-	'zoneFilter'=>MODE_ZONE_FILTER
+	'zoneFilter'=>MODE_ZONE_FILTER,
+	'viewPort'=>array(
+		array($viewPort["ymin"],$viewPort["xmin"]),
+		array($viewPort["ymax"],$viewPort["xmax"])
+	)
 );
 
 ?>

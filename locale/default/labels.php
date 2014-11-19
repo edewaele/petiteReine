@@ -8,6 +8,7 @@ $LABELS = array(
 	'panel.stats.drawRectangle'=>'Rectangle',
 	'panel.stats.drawPolygon'=>'Polygon',
 	'panel.stats.clear'=>'Clear',
+	'panel.stats.showPrivate'=>'Include private parkings',
 	'panel.zones'=>'Districts',
 	'panel.help'=>'Caption / Help',
 	// "About" button and dialog header
@@ -40,6 +41,12 @@ $LABELS = array(
 	'map.parking.accessLabel'=>array(
 		'private'=> '(private)',
 		'customers'=> '(customers or users only)',
+		'other' => '',
+		'empty' => ''
+	),
+	'map.parking.accessLabelWithOpr'=>array(
+		'private'=> '(private , %s)',
+		'customers'=> '(customers or users only, %s)',
 		'other' => '',
 		'empty' => ''
 	),

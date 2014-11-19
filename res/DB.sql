@@ -34,6 +34,7 @@ CREATE TABLE pv_parkings
   access character varying(20),			-- access key in OpenStreetMap
   "timestamp" character(30),
   zone_id character varying(20),		-- the zone that a parking belong to (computed by the import batch)
+  operator text,		-- operator key in OSM
   CONSTRAINT pv_parkings_pkey PRIMARY KEY (obj_id)
 );
 

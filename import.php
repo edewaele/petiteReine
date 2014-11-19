@@ -73,7 +73,7 @@ if($result)
 		
 		$pointCoord[$place->getAttribute('id')] = array('x'=> $place->getAttribute('lon'),'y'=> $place->getAttribute('lat'));
 		
-		$parkingAttr = array('obj_id'=>'n'.$place->getAttribute('id'),'capacity'=>0,'covered'=>'','bicycle_parking'=>'','timestamp'=>$place->getAttribute('timestamp'),'access'=>'');
+		$parkingAttr = array('obj_id'=>'n'.$place->getAttribute('id'),'capacity'=>0,'covered'=>'','bicycle_parking'=>'','timestamp'=>$place->getAttribute('timestamp'),'access'=>'','operator'=>'');
 		
 		// retrieving the attributes of the object
 		$tagList = $place->getElementsByTagName('tag');
@@ -95,8 +95,8 @@ if($result)
 		
 		if($isAParking)
 		{
-			$insertNodeParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp)");
-			$insertNodeParking->execute($parkingAttr);
+			$insertNodeParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp,operator) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp,:operator)");
+			if( ! $insertNodeParking->execute($parkingAttr)){echo print_r($PDO->errorInfo())."<br>";};
 			$dataExists = true;
 		}
 	}
@@ -108,7 +108,7 @@ if($result)
 		$place = $resultsList->item($numWay);
 		
 		
-		$parkingAttr = array('obj_id'=>'w'.$place->getAttribute('id'),'timestamp'=>$place->getAttribute('timestamp'),'capacity'=>0,'covered'=>'','bicycle_parking'=>'','access'=>'');
+		$parkingAttr = array('obj_id'=>'w'.$place->getAttribute('id'),'timestamp'=>$place->getAttribute('timestamp'),'capacity'=>0,'covered'=>'','bicycle_parking'=>'','access'=>'','operator'=>'');
 		
 		$tagList = $place->getElementsByTagName('tag');
 		// retrieving the attributes of the object
@@ -154,8 +154,8 @@ if($result)
 		
 		if($isAParking)
 		{
-			$insertWayParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp)");
-			$insertWayParking->execute($parkingAttr);
+			$insertWayParking = $PDO->prepare("INSERT INTO pv_parkings (obj_id,capacity,covered,parking_type,access,the_geom,timestamp,operator) VALUES (:obj_id,:capacity,:covered,:bicycle_parking,:access,st_geomfromtext(:geom,4326),:timestamp,:operator)");
+			if( ! $insertNodeParking->execute($parkingAttr)){echo print_r($PDO->errorInfo())."<br>";};
 			$dataExists = true;
 		}
 	}
@@ -168,13 +168,16 @@ if($result)
 		{
 			$PDO->exec("TRUNCATE TABLE pv_zones");	
 			$PDO->exec("insert into pv_zones values ('default','Default',0,1,1,st_multi(st_expand(ST_GeomFromText('POINT(0 0)',4326),90)))");	
+			$PDO->exec("update pv_parkings set zone_id = 'default'");
+		}
+		else
+		{
+			// The zone_id of each parking(table pv_parkings) is calculated, according to the geometries in pv_zones
+			$PDO->exec("update pv_parkings set zone_id = rel.zone_id
+			from (select Z.zone_id,obj_id from pv_zones Z,pv_parkings where st_contains(geom,the_geom)) as rel
+			where pv_parkings.obj_id = rel.obj_id");
 		}
 		
-		// The zone_id of each parking(table pv_parkings) is calculated, according to the geometries in pv_zones
-		$PDO->exec("update pv_parkings set zone_id = rel.zone_id
-		from (select Z.zone_id,obj_id from pv_zones Z,pv_parkings where st_contains(geom,the_geom)) as rel
-		where pv_parkings.obj_id = rel.obj_id");
-
 		// All informal parking are deleted from the database
 		$PDO->exec("DELETE FROM pv_parkings WHERE parking_type = 'informal'");
 		

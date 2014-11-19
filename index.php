@@ -48,7 +48,7 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 
 <div id="leftPanel">
 	<h3><?php echo $LABELS["panel.stats"];?></h3>
-	<div>
+	<div id="stats">
 		<!--<h1>Statistiques</h1>-->
 		<div id="stats_global"></div>
 		<div id="zone_analysis">
@@ -56,14 +56,15 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 			<div id="stats_zone"></div>
 			<p><input type="button" id="drawRect" value="<?php echo $LABELS["panel.stats.drawRectangle"];?>">
 			<input type="button" id="drawPolygon" value="<?php echo $LABELS["panel.stats.drawPolygon"];?>">
-			<input type="button" id="eraseZone" value="<?php echo $LABELS["panel.stats.clear"];?>"></P>
+			<input type="button" id="eraseZone" value="<?php echo $LABELS["panel.stats.clear"];?>">
+			<br><input type="checkbox" id="showPrivate" ><label for="showPrivate">Inclure parkings privés</label></P>
 		</div>
 	</div>
 	<?php if(MODE_ZONE_FILTER){?>
 	<h3><?php echo $LABELS["panel.zones"];?></h3>
 	<div>
 		<!--<input type="button" id="zonesAll" value="Tout" />
-		<input type="button" id="zonesNone" value="Rien" />-->
+		<input type="button" id="zonesNone" value="Rien" />-->	
 		<input type="button" id="zonesApply" value="Appliquer" />
 		<div id="zoneList"></div>
 	</div>

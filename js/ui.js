@@ -6,7 +6,9 @@ var isDrawing = false;
 
 
 function mapInit(){
-	map = L.map('map',{zoomControl:false}).setView([47.38925, 0.68841], 13);
+	//map = L.map('map',{zoomControl:false}).setView([47.38925, 0.68841], 13);
+	map = L.map('map',{zoomControl:false});
+	map.fitBounds(CLIENT_CONF.viewPort);
 
 	var baseLayers = {
 	'OpenStreetMap Default': L.tileLayer.provider('OpenStreetMap.Mapnik'),
@@ -207,6 +209,17 @@ function mapInit(){
 				success:function(data)
 				{
 					$("#stats_zone").html(data.content);
+					// the visibility of stats is changed according to the checkbox "Include private parkings", 
+					if($("#showPrivate").is(':checked'))
+					{
+						$(".noPrivate").hide();
+						$(".private").show();
+					}
+					else
+					{
+						$(".private").hide();
+						$(".noPrivate").show();
+					}
 				}
 			});
 		});
@@ -271,6 +284,20 @@ function mapInit(){
 			$(".ui-accordion-content").css("max-height",(event.newSize.y-CLIENT_CONF.reservedHeightMobile)+"px");
 		else
 			$(".ui-accordion-content").css("max-height",(event.newSize.y-CLIENT_CONF.reservedHeight)+"px");
+	});
+	
+	// Checkbox "Include private parkings", the visibility of stats is changed every time the checkbox is clicked
+	$("#showPrivate").change(function(){
+		if($("#showPrivate").is(':checked'))
+		{
+			$(".noPrivate").hide();
+			$(".private").show();
+		}
+		else
+		{
+			$(".private").hide();
+			$(".noPrivate").show();
+		}
 	});
 	
 	if(CLIENT_CONF.zoneFilter)
