@@ -205,7 +205,7 @@ function mapInit(){
 			$.ajax({
 				dataType:'json',
 				url:'api.php',
-				data:{get:'stats',geom:geometryRect,zones:layerLoader.getSelectedZones()},
+				data:{get:'stats',geom:geometryRect,zones:layerLoader.currentZones},
 				success:function(data)
 				{
 					$("#stats_zone").html(data.content);
@@ -310,7 +310,7 @@ function mapInit(){
 			{
 				for(var numZone = 0; numZone < data.length; numZone++)
 				{
-					$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'">'+data[numZone].label+'<br>');
+					$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'"><label for="zone'+data[numZone].zone_id+'">'+data[numZone].label+'</label><br>');
 				}
 			}
 		});
@@ -383,7 +383,7 @@ var layerLoader = {
 			$.ajax({	// AJAX request
 				dataType:'json',
 				url:'api.php',
-				data:{get:this.requests[layerNum],zones:this.getSelectedZones()},
+				data:{get:this.requests[layerNum],zones:this.currentZones},
 				success:function(data)
 				{	// call to the layer's function
 					parentObject.loadFunctions[layerNum](data);
@@ -422,6 +422,7 @@ var layerLoader = {
 		}
 		return zoneString;
 	},
+	// called when the user clicks "Apply" in the zone box, updates the list of selected zones
 	updateZones:function()
 	{
 		this.currentZones = this.getSelectedZones();
@@ -466,22 +467,5 @@ var popupManager = {
 };
 
 
-function getSelectedZones()
-{
-	var zoneString = "";
-	if(CLIENT_CONF.zoneFilter)
-	{
-		$(".zoneSelector").each(function(chkbox){
-			if($(this).is(':checked')){
-				var zoneId = $(this).attr("id").replace("zone","");
-				if(zoneString == "")
-					zoneString = zoneId;
-				else
-					zoneString += ","+zoneId;
-			}
-		});
-	}
-	return zoneString;
-}
 
 window.onload = mapInit;

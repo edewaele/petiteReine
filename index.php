@@ -56,9 +56,9 @@ var CLIENT_CONF = <?php echo json_encode($CLIENT_CONF, JSON_NUMERIC_CHECK);?>;
 			<div id="stats_zone"></div>
 			<p><input type="button" id="drawRect" value="<?php echo $LABELS["panel.stats.drawRectangle"];?>">
 			<input type="button" id="drawPolygon" value="<?php echo $LABELS["panel.stats.drawPolygon"];?>">
-			<input type="button" id="eraseZone" value="<?php echo $LABELS["panel.stats.clear"];?>">
-			<br><input type="checkbox" id="showPrivate" ><label for="showPrivate">Inclure parkings privés</label></P>
+			<input type="button" id="eraseZone" value="<?php echo $LABELS["panel.stats.clear"];?>"></P>
 		</div>
+		<p><input type="checkbox" id="showPrivate" ><label for="showPrivate">Inclure parkings privés</label></p>
 	</div>
 	<?php if(MODE_ZONE_FILTER){?>
 	<h3><?php echo $LABELS["panel.zones"];?></h3>
