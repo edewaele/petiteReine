@@ -209,17 +209,7 @@ function mapInit(){
 				success:function(data)
 				{
 					$("#stats_zone").html(data.content);
-					// the visibility of stats is changed according to the checkbox "Include private parkings", 
-					if($("#showPrivate").is(':checked'))
-					{
-						$(".noPrivate").hide();
-						$(".private").show();
-					}
-					else
-					{
-						$(".private").hide();
-						$(".noPrivate").show();
-					}
+					layerLoader.setStatVisibility();
 				}
 			});
 		});
@@ -288,16 +278,7 @@ function mapInit(){
 	
 	// Checkbox "Include private parkings", the visibility of stats is changed every time the checkbox is clicked
 	$("#showPrivate").change(function(){
-		if($("#showPrivate").is(':checked'))
-		{
-			$(".noPrivate").hide();
-			$(".private").show();
-		}
-		else
-		{
-			$(".private").hide();
-			$(".noPrivate").show();
-		}
+		layerLoader.setStatVisibility();
 	});
 	
 	if(CLIENT_CONF.zoneFilter)
@@ -392,6 +373,7 @@ var layerLoader = {
 			layer.layerLoaderLoaded =  true;
 		}
 	},
+	// called when the user clicks "Apply" in the zone box, updates the list of selected zones
 	reloadAll:function(){
 		this.updateZones();
 		for(var numLayer = 0; numLayer <  this.layers.length; numLayer++)
@@ -422,7 +404,7 @@ var layerLoader = {
 		}
 		return zoneString;
 	},
-	// called when the user clicks "Apply" in the zone box, updates the list of selected zones
+	// determine which zones are selected and refresh the statistics
 	updateZones:function()
 	{
 		this.currentZones = this.getSelectedZones();
@@ -433,8 +415,23 @@ var layerLoader = {
 			success:function(data)
 			{
 				$("#stats_global").html(data.content);
+				layerLoader.setStatVisibility();
 			}
 		});
+	},
+	setStatVisibility: function()
+	{
+		// the visibility of stats is changed according to the checkbox "Include private parkings", 
+		if($("#showPrivate").is(':checked'))
+		{
+			$(".noPrivate").hide();
+			$(".private").show();
+		}
+		else
+		{
+			$(".private").hide();
+			$(".noPrivate").show();
+		}
 	}
 };
 
