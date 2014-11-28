@@ -62,8 +62,8 @@ $LABELS = array(
 	'stats.byType'=>array(
 		"stands"=>"%s spaces on stands (%s)",
 		"wall_loops"=>"%s spaces on wall loops (%s)",
-		"shed"=>"%s stapces in sheds (%s)",
-		"other"=>"%s spaces in other parking typess (%s)",
+		"shed"=>"%s spaces in sheds (%s)",
+		"other"=>"%s spaces in other parking types (%s)",
 		"unknown"=>"%s spaces in parkings of unknown type (%s)"
 	)
 );
