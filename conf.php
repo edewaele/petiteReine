@@ -18,22 +18,10 @@ define('DB_NAME','emmanuel');		// database name
 /**
 	STEP 2 : THE AREA TO IMPORT
 */
-// To specify the area that is imported :
-// - You can use an OSM relation (true)
-// - Or define a bounding box (false)
-define('IMPORT_FROM_RELATION',false);
-
-// If IMPORT_FROM_RELATION = true the data is extracted from a given zone, which is defined by an OpenStreetMap relation
+// the data is extracted from a given zone, which is defined by an OpenStreetMap relation
 // you have to set the relation id in OSM
 //define('OSM_ZONE',76306);
 define('OSM_ZONE',1663056);
-
-// If IMPORT_FROM_RELATION = false, define the position of your bounding box
-// this example describes an area around Poitiers, France
-define('BBOX_NORTH',46.64118);
-define('BBOX_SOUTH',46.51351);
-define('BBOX_WEST',0.208053);
-define('BBOX_EAST',0.483398);
 
 /* Distances and areas are calculated by transforming lon/lat coordinates into a projection 
 	so that 1 unit in the projection is roughly equivalent to 1 meter.

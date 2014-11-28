@@ -21,24 +21,15 @@ $startTime = time();
 $dataExists = false;
 
 // The following Overpass API query gets all nodes and ways within an area, with tag "amenity=bicycle_parking"
-$areaCriterion = "";
-if(IMPORT_FROM_RELATION)
-{
-	$areaCriterion = '<area-query ref="'.(3600000000+OSM_ZONE).'"/>';
-}
-else
-{
-	$areaCriterion = '<bbox-query s="'.BBOX_SOUTH.'" n="'.BBOX_NORTH.'" w="'.BBOX_WEST.'" e="'.BBOX_EAST.'"/>';
-}
 $postdata = http_build_query(array('data' => '<osm-script >
   <union>
 	<query type="node">
 		<has-kv k="amenity" v="bicycle_parking" />
-		'.$areaCriterion.'
+		<area-query ref="'.(3600000000+OSM_ZONE).'"/>
 	</query>
 	<query type="way">
 		<has-kv k="amenity" v="bicycle_parking" />
-		'.$areaCriterion.'
+		<area-query ref="'.(3600000000+OSM_ZONE).'"/>
 	</query>
    </union>
   <union>
@@ -48,23 +39,6 @@ $postdata = http_build_query(array('data' => '<osm-script >
   <print mode="meta"/>
 </osm-script>
 '));
-echo '<osm-script >
-  <union>
-	<query type="node">
-		<has-kv k="amenity" v="bicycle_parking" />
-		$areaCriterion
-	</query>
-	<query type="way">
-		<has-kv k="amenity" v="bicycle_parking" />
-		$areaCriterion
-	</query>
-   </union>
-  <union>
-    <item/>
-    <recurse type="down"/>
-  </union>
-  <print mode="meta"/>
-</osm-script>';
 $opts = array('http' =>
 array(
 'method' => 'POST',
