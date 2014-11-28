@@ -21,7 +21,7 @@ define('DB_NAME','emmanuel');		// database name
 // To specify the area that is imported :
 // - You can use an OSM relation (true)
 // - Or define a bounding box (false)
-define('IMPORT_FROM_RELATION',false);
+define('IMPORT_FROM_RELATION',true);
 
 // If IMPORT_FROM_RELATION = true the data is extracted from a given zone, which is defined by an OpenStreetMap relation
 // you have to set the relation id in OSM

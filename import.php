@@ -47,24 +47,7 @@ $postdata = http_build_query(array('data' => '<osm-script >
   </union>
   <print mode="meta"/>
 </osm-script>
-'));
-echo '<osm-script >
-  <union>
-	<query type="node">
-		<has-kv k="amenity" v="bicycle_parking" />
-		$areaCriterion
-	</query>
-	<query type="way">
-		<has-kv k="amenity" v="bicycle_parking" />
-		$areaCriterion
-	</query>
-   </union>
-  <union>
-    <item/>
-    <recurse type="down"/>
-  </union>
-  <print mode="meta"/>
-</osm-script>';
+'));	
 $opts = array('http' =>
 array(
 'method' => 'POST',
@@ -117,6 +100,9 @@ if($result)
 			}
 		}
 		
+		// make sure that the capacity is actually an integer
+		$parkingAttr["capacity"] = intval($parkingAttr["capacity"]);
+		
 		$parkingAttr["geom"] = "POINT (".$place->getAttribute('lon')." ".$place->getAttribute('lat').")";
 		
 		if($isAParking)
@@ -151,6 +137,9 @@ if($result)
 				$isAParking = true;
 			}
 		}
+		
+		// make sure that the capacity is actually an integer
+		$parkingAttr["capacity"] = intval($parkingAttr["capacity"]);
 		
 		// bounding box calculation, based on the nodes that make up the polygon
 		$xMin = 0;$xMax = 0; $yMin = 0;$yMax = 0; 
