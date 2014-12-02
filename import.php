@@ -242,6 +242,32 @@ if($result)
 		$PDO->commit();
 	}
 	
+	// STEP 3 : EXPORT THE PARKINGS INTO A GEOJSON FILE
+	$sqlParkings = "SELECT obj_id as osm_id,capacity,covered,parking_type as bicycle_parking,access,operator,zone_id,ST_AsGeoJSON(public.ST_Transform((the_geom),4326)) AS geojson FROM pv_parkings where zone_id IN (SELECT zone_id FROM pv_zones WHERE active = 1)";
+	$queryParkings = $PDO->query($sqlParkings);
+	$jsonFile = new GeoJSON("export/parkings.json");
+	while($rs = $queryParkings->fetch())
+	{
+		$properties = $rs;
+		if(! MODE_ZONE_FILTER)
+		{
+			unset($properties['zone_id']);
+		}
+		unset($properties['geojson']);
+		// remove the integer keys
+		foreach($properties as $key => $value)
+		{
+			if(is_numeric($key))
+			{
+				unset($properties[$key]);
+			}
+		}
+		
+		$jsonFile->addPoint($rs['geojson'],$properties);
+	}
+	$jsonFile->export();
+	
+	// STEP 4 : SAVING A TRACE
 	// Insert a new row in the trace table
 	$traceAttr = array(":status"=>'false',
 		":startdt"=>date('Y-m-d h:i:s'),
