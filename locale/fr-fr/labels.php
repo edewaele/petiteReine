@@ -31,6 +31,7 @@ $LABELS = array(
 		'stands'=> 'Arceaux',
 		'shed' => 'Abri à vélos',
 		'wall_loops'=>'Pince-roues',
+		'rack'=>'Suspendu',
 		'empty' => 'Type inconnu',
 		'other' => 'Autre type'
 	),
@@ -63,6 +64,7 @@ $LABELS = array(
 		"stands"=>"%s places en arceaux (%s)",
 		"wall_loops"=>"%s places en pince-roue (%s)",
 		"shed"=>"%s places en abri (%s)",
+		"rack"=>"%s places en stationnement suspendu (%s)",
 		"other"=>"%s places sur autres types de parking (%s)",
 		"unknown"=>"%s places sur parkings de type inconnu (%s)"
 	)
