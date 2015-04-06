@@ -13,8 +13,6 @@ function mapInit(){
 	var baseLayers = {
 	'OpenStreetMap Default': L.tileLayer.provider('OpenStreetMap.Mapnik'),
 	'OpenStreetMap France': L.tileLayer.provider('OpenStreetMap.France'),
-	'OpenStreetMap German Style': L.tileLayer.provider('OpenStreetMap.DE'),
-	'OpenStreetMap Black and White': L.tileLayer.provider('OpenStreetMap.BlackAndWhite'),
 	'OpenStreetMap H.O.T.': L.tileLayer.provider('OpenStreetMap.HOT'),
 	'Thunderforest OpenCycleMap': L.tileLayer.provider('Thunderforest.OpenCycleMap'),
 	'Thunderforest Transport': L.tileLayer.provider('Thunderforest.Transport'),
@@ -291,7 +289,7 @@ function mapInit(){
 			{
 				for(var numZone = 0; numZone < data.length; numZone++)
 				{
-					$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'"><label for="zone'+data[numZone].zone_id+'">'+data[numZone].label+'</label><br>');
+					$("#zoneList").append('<input type="checkbox" '+(data[numZone].visible_default==1?'checked="checked"':"")+' class="zoneSelector" id="zone'+data[numZone].zone_id+'"><label for="zone'+data[numZone].zone_id+'">'+data[numZone].label+' <span style="font-size:60%">('+data[numZone].spaces+')</small></label><br>');
 				}
 			}
 		});

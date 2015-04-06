@@ -353,7 +353,7 @@ if(isset($_REQUEST["get"]))
 		// put every answer in the KML response
 		$result = array();
 		
-		$sqlZones = "SELECT zone_id,label,visible_default FROM pv_zones WHERE active = 1 ORDER BY label";
+		$sqlZones = "SELECT P.zone_id,label,visible_default,sum(capacity) as spaces FROM pv_zones Z, pv_parkings P WHERE active = 1 and access <> 'private' AND P.zone_id = Z.zone_id GROUP BY P.zone_id,label,visible_default ORDER BY label";
 		$queryZones = $PDO->query($sqlZones);
 		while($rs = $queryZones->fetch(PDO::FETCH_ASSOC))
 		{
